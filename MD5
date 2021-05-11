@@ -1,0 +1,13 @@
+c1535921a7610ecec19f3c67d8cb8523 *DESCRIPTION
+a29f2567f2b370738c67d08cee188ba4 *NAMESPACE
+42823c2a0faefa2ad5770c9a3f1d4472 *NEWS.md
+d1cb32cec748f0ef01076a6e5d682825 *R/data1.R
+aa63e7e88d1fbae25b2806226fa9cd66 *R/data2.R
+d695ccb9b0070c385a45e97e5ad9d95e *R/main.R
+55b45b9f8aa864b80df96230788603e5 *R/snap.R
+96d7e55722ea467f3145ab140daf96ee *R/support.R
+e53d342b4a9b2e0bce95fc23a27dc68c *data/friedman3.rda
+8d56d58522098637825fd0a032cdcc27 *data/threenorm.rda
+9721d4691ebdbe153fd6bcea28144fe8 *man/friedman3.Rd
+a3aae9aed2e7aecb10c9f56c1a0c62a5 *man/snap.Rd
+d912090ec29527a61020aa38a77323d8 *man/threenorm.Rd
