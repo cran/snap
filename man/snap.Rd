@@ -36,8 +36,8 @@ snap(
   winsor = FALSE,
   q_min = 0.01,
   q_max = 0.99,
+  normalization = TRUE,
   seed = 42,
-  reproducibility = FALSE,
   verbose = 0
 )
 }
@@ -100,9 +100,9 @@ snap(
 
 \item{q_max}{Positive numeric. Maximum quantile threshold for Winsorization. Default: 0.99.}
 
-\item{seed}{Positive integer. Seed value to control random processes. Default: 42.}
+\item{normalization}{Logical. After each layer it performs a batch normalization. Default: TRUE.}
 
-\item{reproducibility}{Logical. Set to TRUE to reproduce runs. Default: FALSE.}
+\item{seed}{Positive integer. Seed value to control random processes. Default: 42.}
 
 \item{verbose}{Positive integer. Set the level of information from Keras. Default: 0.}
 }
@@ -143,9 +143,7 @@ snap(threenorm, "classes", layers = 2, activations = c("gelu", "swish"), nodes =
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://keras.rstudio.com}
-  \item \url{https://rdrr.io/cran/dbscan/man/lof.html}
-  \item \url{https://www.rdocumentation.org/packages/CORElearn/versions/1.56.0/topics/attrEval}
+  \item \url{https://rpubs.com/giancarlo_vercellino/snap}
 }
 
 }

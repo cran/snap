@@ -1,4 +1,7 @@
-# snap 1.0.0
+# snap 1.1.0
 
-* Added a `NEWS.md` file to track changes to the package.
+* Removed the reproducibility option
 
+* Added normalization option
+
+* Added reference link to rpubs

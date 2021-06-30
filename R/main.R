@@ -29,8 +29,8 @@
 #' @param winsor Logical. Set to TRUE in case you want to perform Winsorization on regression tasks. Default: FALSE.
 #' @param q_min Positive numeric. Minimum quantile threshold for Winsorization. Default: 0.01.
 #' @param q_max Positive numeric. Maximum quantile threshold for Winsorization. Default: 0.99.
+#' @param normalization Logical. After each layer it performs a batch normalization. Default: TRUE.
 #' @param seed Positive integer. Seed value to control random processes. Default: 42.
-#' @param reproducibility Logical. Set to TRUE to reproduce runs. Default: FALSE.
 #' @param verbose Positive integer. Set the level of information from Keras. Default: 0.
 #'
 #' @author Giancarlo Vercellino \email{giancarlo.vercellino@gmail.com}
@@ -58,8 +58,8 @@
 #'
 #' @export
 #'
-#' @import tensorflow
 #' @import keras
+#' @import tensorflow
 #' @import dplyr
 #' @import purrr
 #' @import forcats
@@ -84,18 +84,10 @@ snap <-function(data, target, task=NULL, positive=NULL,
                 layers = 1, activations = "relu", regularization_L1 = 0, regularization_L2 = 0, nodes = 32, dropout = 0,
                 span=0.2, min_delta=0, batch_size=32, epochs=50, imp_thresh  = 0, anom_thresh = 1,
                 output_activation=NULL, optimizer = "Adam", loss = NULL, metrics = NULL,
-                winsor = FALSE, q_min = 0.01, q_max = 0.99,
-                seed = 42, reproducibility = FALSE, verbose = 0)
+                winsor = FALSE, q_min = 0.01, q_max = 0.99, normalization = TRUE,
+                seed = 42, verbose = 0)
 
 {
-  ###REPRODUCIBILITY
-  if(reproducibility == TRUE)
-  {
-    set.seed(seed)
-    py_set_seed(seed = seed, disable_hash_randomization = TRUE)
-    use_session_with_seed(seed = seed, disable_gpu = TRUE, disable_parallel_cpu = TRUE)
-  }
-
   config <- tf$compat$v1$ConfigProto(gpu_options = list(allow_growth = TRUE))
   sess <- tf$compat$v1$Session(config = config)
 
@@ -164,8 +156,14 @@ snap <-function(data, target, task=NULL, positive=NULL,
 
   if(task=="multilabel")
   {
-    if(!all(unlist(y_data)%in% c(0, 1)))
-    {
+    #class_names <- replicate(ncol(y_data), c(0, 1), simplify = F)
+    #class_num <- map_dbl(class_names, ~length(.x))
+    #start_index <- head(c(1, cumsum(class_num)+1),-1)
+    #end_index <- cumsum(class_num)
+    y_data <- as.data.frame(lapply(y_data, as.character))
+
+    #if(!all(unlist(y_data)%in% c(0, 1)))
+    #{
       y_data <- as.data.frame(lapply(y_data, factor))
       y_orig <- y_data
       class_names <- lapply(y_data, levels)
@@ -176,7 +174,7 @@ snap <-function(data, target, task=NULL, positive=NULL,
       y_names <- unlist(map2(colnames(y_data), class_names, ~paste0(.x,"_level_", .y)))
       y_data <- as.data.frame(map2(y_data, class_num, ~to_categorical(as.numeric(.x)-1, num_classes = .y)))
       colnames(y_data) <- y_names
-    }
+    #}
   }
 
   if(task=="regr" & winsor == TRUE)
@@ -190,9 +188,9 @@ snap <-function(data, target, task=NULL, positive=NULL,
   if(embedding == "sequence"){sequence_embedding <- TRUE; global_embedding <- FALSE}
 
   ###SELECTION
+  if(task=="multilabel" & imp_thresh > 0){imp_thresh <- 0; message("Feature selection not available for multilabel task. Setting imp_thresh to zero.")}
   if(imp_thresh > 0)
   {
-    if(task=="multilabel"){stop("feature selection not available for multilabel")}
     target <- paste0(colnames(y_orig), collapse = " + ")
     importance_scores <- suppressWarnings(attrEval(as.formula(paste0(target, "~.")), cbind(y_orig, x_orig), estimator=ifelse(task == "regr", "RReliefFbestK", "ReliefFbestK")))
     importance_scores <- ecdf(importance_scores)(importance_scores)
@@ -297,7 +295,7 @@ snap <-function(data, target, task=NULL, positive=NULL,
     if(!(unlist(configuration$activations)[l] %in% checklist)){interim<- layer_activation(object=interim, activation = unlist(configuration$activations)[l])}
 
     interim<-layer_dropout(object=interim, rate=unlist(configuration$dropout)[l])
-    interim<-layer_batch_normalization(object=interim)
+    if(normalization==TRUE){interim<-layer_batch_normalization(object=interim)}
   }
 
   if(skip_shortcut==TRUE)

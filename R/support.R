@@ -88,7 +88,7 @@ multilabel_metrics <- function(actual, predicted)
   macro_sen <- mean(mapply(function(x) tryCatch(sum((predicted == x) & (actual == x))/sum((actual == x)), error = function(e) NA), x = actual_lvl), na.rm = TRUE)
   macro_csi <- mean(mapply(function(x) tryCatch(sum((predicted == x) & (actual == x))/sum((predicted == x) | (actual == x)), error = function(e) NA), x = actual_lvl), na.rm = TRUE)
   macro_fsc <- mean(mapply(function(x) tryCatch(2 * sum((predicted == x) & (actual == x))/(sum((predicted == x) | (actual == x)) + sum((predicted == x) & (actual == x))), error = function(e) NA), x = actual_lvl), na.rm = TRUE)
-  micro_kpp <- mean(mapply(function(ft) tryCatch(1 - (1 - mean(actual[, ft] == predicted[, ft]))/(1- sum(table(actual[, ft])*table(predicted[, ft]))/n_length^2), error = function(e) NA), ft = 1:n_feats), na.rm = TRUE)
+  micro_kpp <- mean(mapply(function(ft) tryCatch(1 - (1 - mean(actual[, ft] == predicted[, ft], na.rm = TRUE))/(1- sum(table(actual[, ft])*table(predicted[, ft]), na.rm = TRUE)/n_length^2), error = function(e) NA), ft = 1:n_feats), na.rm = TRUE)
   micro_kdl <- mean(mapply(function(ft) tryCatch(cor(as.numeric(actual[, ft]), as.numeric(predicted[, ft]), use = "pairwise.complete.obs", method = "kendall"), error = function(e) NA), ft = 1:n_feats), na.rm = TRUE)
 
   metrics <- round(c(macro_bac = macro_bac,  macro_prc = macro_prc, macro_sen = macro_sen, macro_csi = macro_csi, macro_fsc= macro_fsc, micro_kpp = micro_kpp, micro_kdl = micro_kdl), 4)
